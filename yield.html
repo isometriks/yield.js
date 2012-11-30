@@ -1,0 +1,49 @@
+<html>
+    <head>
+    	<script src="yield.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    </head>
+    <body>
+        <input id="timer">
+        <script>
+            function async(){
+
+            	var json_file = this.yield(function(){
+            		var _this = this; 
+            		setTimeout(function(){
+                        _this.resume('test.json'); 
+            		}, 1000); 
+            	});
+
+                var json = this.yield(function(){
+                    $.getJSON(json_file, null, this.resume);
+                }); 
+ 
+                this.sleep(2000); 
+
+                var final_value = this.yield(function(){
+                    json.foo = 'bar'; 
+                    this.resume(json); 
+                });
+
+            	console.log('End value:', final_value); 
+                console.log('End Time:', new Date());  
+            }
+
+            var $timer; 
+            var count = 0; 
+            $(function(){
+                $timer = $('#timer'); 
+                window.setInterval(timer, 10); 
+            }); 
+
+            function timer(){
+                count += 10; 
+                $timer.val(count/1000); 
+            }
+
+            console.log('Start: ' + new Date()); 
+            yield.run(async); 
+        </script>
+    </body>
+</html>
