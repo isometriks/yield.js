@@ -3,10 +3,7 @@ var yield = (function(){
 
     function run(fn){
         var inst = env; 
-        inst.init(fn); 
-        return inst.iterate(function(){
-            fn.call(inst)
-        }); 
+        inst.init(fn);  
     }
 
     var env = (function(){
@@ -22,6 +19,7 @@ var yield = (function(){
                 fn.call(_this); 
             }
             yield_stack = []; 
+            iterate(); 
         }
 
         function yield(fn){
