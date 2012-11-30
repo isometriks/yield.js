@@ -35,7 +35,7 @@ Example Usage:
     }
 
     // Run the function
-    yield.run(async); 
+    yield(async); 
     
 How does it work?
 --------
