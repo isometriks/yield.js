@@ -1,84 +1,51 @@
 
-var yield = (function(){
+var yield = function(fn){
+    var inst = new yieldEnv(fn); 
+    inst.run(); 
+}
 
-    function run(fn){
-        var inst = env; 
-        inst.init(fn);  
+var yieldEnv = function(fn){
+    this.i = 0; 
+    this.fn = fn; 
+    this.yield_stack = [];    
+}
+
+yieldEnv.prototype.yield = function(fn){
+    if(this.yield_stack.length > this.i){
+        return this.yield_stack[this.i++]; 
     }
 
-    var env = (function(){
+    // Call anonymous function
+    fn.call(this);
 
-        var i = 0; 
-        var iterate_fn; 
-        var yield_stack; 
+    throw {type:'exit'}; 
+}
 
-        function init(fn){
-            i = 0; 
+yieldEnv.prototype.run = function(){
+    try {
+        this.fn(); 
+    } catch (ex){
+        if(ex.type === 'exit'){
+            return; 
+        } else {
+            throw ex; 
+        }            
+    } 
+}
+
+yieldEnv.prototype.resume = function(value){
+    this.yield_stack[this.i] = value; 
+    this.i = 0; 
+    this.run();   
+}
+
+yieldEnv.prototype.sleep = function(t){
+    this.yield(
+        function(){
             var _this = this; 
-            iterate_fn = function(){
-                fn.call(_this); 
-            }
-            yield_stack = []; 
-            iterate(); 
+            setTimeout(function(){
+                _this.resume(''); 
+            }, t); 
         }
-
-        function yield(fn){
-            if(yield_stack.length > i){
-                return yield_stack[i++]; 
-            }
-
-            // Call anonymous function
-            fn.call(this);
-
-            throw exit(); 
-        }
-
-        function iterate(){
-            try {
-                iterate_fn(); 
-            } catch (ex){
-                if(ex.type === 'exit'){
-                    return; 
-                } else {
-                    throw ex; 
-                }            
-            } 
-        }
-
-        function resume(value){
-            yield_stack[i] = value; 
-            i = 0; 
-            iterate();   
-        }
-
-        function sleep(t){
-            this.yield(
-                function(){
-                    var _this = this; 
-                    setTimeout(function(){
-                        _this.resume(''); 
-                    }, t); 
-                }
-            ); 
-        }
-
-        function exit(){
-            return {
-                type: 'exit'
-            }
-        }
-
-        return {
-            init: init,  
-            yield: yield, 
-            sleep: sleep, 
-            iterate: iterate, 
-            resume: resume
-        };
-    })(); 
-
-    return {
-        run: run
-    };
-
-})(); 
+    ); 
+}
