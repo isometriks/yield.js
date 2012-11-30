@@ -48,7 +48,7 @@ var yield = (function(){
         function resume(value){
             yield_stack[i] = value; 
             i = 0; 
-        	iterate();   
+            iterate();   
         }
 
         function sleep(t){
@@ -70,10 +70,10 @@ var yield = (function(){
 
         return {
             init: init,  
-        	yield: yield, 
+            yield: yield, 
             sleep: sleep, 
             iterate: iterate, 
-        	resume: resume
+            resume: resume
         };
     })(); 
 
